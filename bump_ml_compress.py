@@ -34,7 +34,7 @@ def createTensorBuffer(buffer_size, w, h, sample_data, device):
     # preparing data for ml.
     print("start creating ml input and target data")
     index = 0
-    for i in range(w):
+    for i in range(15, w):
         print("line idx", i, " of ", w)
         for j in range(h):
             for k in range(bdp.SAMPLE_RAY_COUNT):

@@ -66,6 +66,9 @@ import torch
 import bump_data_process as bdp
 import bump_ml_per_pixel_compress as bmc
 
+START_X = 16
+START_Y = 16
+
 generate_bump_sample_rays = False
 debug_draw_sample_ray = False
 retrain_ml_model = True
@@ -102,8 +105,8 @@ if debug_draw_sample_ray:
 
 ml_result = np.empty(w * h, dtype = np.float32)  
 
-for i in range(w):
-    for j in range(h):
+for i in range(START_X, w):
+    for j in range(STA, h):
         print("process pixel", i, j)
         model = None
         if retrain_ml_model:

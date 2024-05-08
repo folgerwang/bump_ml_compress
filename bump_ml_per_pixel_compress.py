@@ -6,6 +6,8 @@ import torch.nn.init as init
 from torch.utils.data import DataLoader, TensorDataset
 import bump_data_process as bdp
 
+INNER_LAYER_SIZE = 64
+
 def custom_init(tensor):
     # Your custom initialization logic here
     # For example, initialize with random values from a normal distribution
@@ -14,12 +16,13 @@ def custom_init(tensor):
 class BumpmapInfoNet(nn.Module):
     def __init__(self):
         super(BumpmapInfoNet, self).__init__()
-        self.bias1 = nn.Parameter(custom_init(torch.empty(8)))
-        self.fc1 = nn.Linear(2, 8)  # Input layer (theta, phi) -> 64 nodes
-        self.fc2 = nn.Linear(8, 1)  # Output layer (dist)
+        self.bias1 = nn.Parameter(custom_init(torch.empty(INNER_LAYER_SIZE)))
+        self.fc1 = nn.Linear(2, INNER_LAYER_SIZE)  # Input layer (theta, phi) -> 64 nodes
+        self.fc2 = nn.Linear(INNER_LAYER_SIZE, 1)  # Output layer (dist)
 
     def forward(self, x):
-        x = torch.sin(self.fc1(x) + self.bias1)
+        x = self.fc1(x) + self.bias1
+        x = torch.sin(x)
         x = torch.flatten(torch.relu(self.fc2(x)))
         return x
 
@@ -60,13 +63,14 @@ def trainMLModel(inputs, targets, buffer_size, file_name, write_out, device):
     optimizer = optim.Adam(model.parameters(), lr=0.01)
 
     # Training loop
-    epochs = 100
+    epochs = 1000
     loss = None
     num_batches = buffer_size // batch_size
     early_stop = False
     for epoch in range(epochs):
         #print(f'Epoch {epoch+1}/{epochs}')
         if early_stop:
+            print("epoch", epoch)
             break
 
         for batch_index, (inputs, targets) in enumerate(dataloader):
